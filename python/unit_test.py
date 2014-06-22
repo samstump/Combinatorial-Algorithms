@@ -1,49 +1,56 @@
 import combalg
 import time
+import math
+import unittest
 
-# power set
-a = [1,2,3]
-print 'power set',a,':'
-for t in combalg.powerset(a):
-  print t
-print
+def nCr(n,r):
+  return math.factorial(n)/math.factorial(r)/math.factorial(n-r)
 
-# k subsets  
-b = [1,2,3,4,5]
-k = 3
-print k,'subsets of',b,':'
-for t in combalg.all_k_subsets(b,k):
-  print t
-print
+# TODO: the generator tests should test for uniqueness
 
-# random subsets
-n = 10
-print n,'random subsets of',b
-for i in xrange(n):
-  print combalg.random_subset(b)
-print
+class TestCombalgFunctions(unittest.TestCase):
+  def test_powerset(self):
+    n = 15
+    i = 0
+    a = range(n)
+    for t in combalg.powerset(a):
+      self.assertTrue(set(t) <= set(a))
+      i += 1
+    self.assertTrue(i == 2**n)
 
-# random k subset
-c = range(10)
-print n,'random',k,'subsets of [',c[0],'...',c[len(c)-1],']'
-for i in xrange(n):
-  print combalg.random_k_subset(c,k)
-print
-
-# compositions
-print '2 compositions of 6'
-for t in combalg.compositions(6,2):
-  print t
-print
-
-# random compositions
-print 'random compositions of 10 into 4 parts'
-for t in xrange(10):
-  print combalg.random_composition(10,4)
+  def test_random_subset(self):
+    n = 15
+    a = range(n)
+    trials = 100
+    for i in xrange(trials):
+      t = combalg.random_subset(a)
+      self.assertTrue(set(t) <= set(a))
+      
+  def test_all_k_subsets(self):
+    n = 15
+    k = 6
+    a = range(n)
+    i = 0
+    for t in combalg.all_k_subsets(a,k):
+      self.assertTrue(len(t) == k)
+      self.assertTrue(set(t) <= set(a))
+      i += 1
+    self.assertTrue(i == nCr(n,k))
+    
+  def test_random_k_subset(self):
+    n = 15
+    k = 6
+    a = range(n)
+    trials = 100
+    for i in xrange(trials):
+      t = combalg.random_k_subset(a,k)
+      self.assertTrue(len(t) == k)
+      self.assertTrue(set(t) <= set(a))
   
-#TODO: enumerate permutations
-#TODO: random permutations
-#TODO: enumerate integer partitions
-#TODO: random integer partitions
+  # TODO: compositions
+  # TODO: permutations
+  # TODO: partitions
 
-  
+# execute
+suite = unittest.TestLoader().loadTestsFromTestCase(TestCombalgFunctions)
+unittest.TextTestRunner(verbosity=3).run(suite)
