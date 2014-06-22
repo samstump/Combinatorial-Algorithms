@@ -24,7 +24,7 @@ for i in xrange(n):
 print
 
 # random k subset
-c = range(100)
+c = range(10)
 print n,'random',k,'subsets of [',c[0],'...',c[len(c)-1],']'
 for i in xrange(n):
   print combalg.random_k_subset(c,k)
@@ -35,3 +35,15 @@ print '2 compositions of 6'
 for t in combalg.compositions(6,2):
   print t
 print
+
+# random compositions
+print 'random compositions of 10 into 4 parts'
+for t in xrange(10):
+  print combalg.random_composition(10,4)
+  
+#TODO: enumerate permutations
+#TODO: random permutations
+#TODO: enumerate integer partitions
+#TODO: random integer partitions
+
+  

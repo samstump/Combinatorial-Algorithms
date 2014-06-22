@@ -5,6 +5,8 @@
   these algorithms comes from
     [1] "Combinatorial Algorithms (for Computers and Calculators), 2nd ed.", Nijenhuis & Wilf, Academic Press, 1978
         http://www.math.upenn.edu/~wilf/website/CombinatorialAlgorithms.pdf
+    [2] "Fast Algorithms for Generating Integer Partitions", Zoghbi & Stojmenovic, 1998
+        http://www.site.uottawa.ca/~ivan/F49-int-part.pdf
 '''
 
 import random
@@ -133,3 +135,76 @@ def random_permutation(elements):
     a[m] = tmp
   return a
   
+'''
+  A generator that returns all partitions of n, that is all x0,x1,x2,...,xk such that sum(xi)k = n and xi > 0
+  Algorithm ZS1 in [2]
+'''  
+def partitions(n):
+  x = [1]*n
+  x[0] = n
+  m = 1
+  h = 1
+  yield x[:m]
+ 
+  while x[0] != 1:
+    if x[h-1] == 2:
+      m += 1
+      x[h-1] = 1
+      h -= 1
+    else:
+      r = x[h-1] - 1
+      t = m - h + 1
+      x[h-1] = r
+      while t >= r:
+        x[h] = r
+        t = t - r
+        h += 1
+      if t == 0:
+        m = h
+      else:
+        m = h + 1
+      if t > 1:
+        x[h] = t
+        h += 1
+    yield x[:m]
+
+'''
+  Returns a random partition of n
+  TODO: 
+    the local function 'num_partitions(n)' is not smart at all
+    the local functions 'num_partitions(n)' and 'choose_dj(n, rho)' can be combined, as in [1].  I have had better
+      luck implementing algorithms from [1] using the mathematical description and NOT using the fortran source.
+'''
+def random_partition(n):
+  def num_partitions(n):
+    if n <= 1:
+      return 1
+    sum = 1
+    for j in xrange(1,n):
+      d = 1
+      while n - j*d >= 0:
+        sum += d * num_partitions(n - j*d)
+        d += 1
+    return sum/n
+
+  def choose_dj(n, rho):
+    denom = num_partitions(n)
+    if n <= 1:
+      return 1,1
+    sum = 0
+    for j in xrange(1,n):
+      d = 1
+      while n - j*d >= 0:
+        sum += float(d * num_partitions(n - j*d))/n
+        if float(sum)/denom >= rho:
+          return d,j      
+        d += 1
+    return 1,n
+
+  a = []
+  m = n
+  while m > 0:
+    d,j = choose_dj(m, random.random())
+    a = a + [d]*j
+    m -= j*d
+  return sorted(a,reverse=True)
