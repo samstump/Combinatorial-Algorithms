@@ -176,15 +176,20 @@ def partitions(n):
       luck implementing algorithms from [1] using the mathematical description and NOT using the fortran source.
 '''
 def random_partition(n):
+  P = {}
   def num_partitions(n):
     if n <= 1:
       return 1
-    sum = 1
-    for j in xrange(1,n):
-      d = 1
-      while n - j*d >= 0:
-        sum += d * num_partitions(n - j*d)
-        d += 1
+    if n not in P:
+      sum = 1
+      for j in xrange(1,n):
+        d = 1
+        while n - j*d >= 0:
+          sum += d * num_partitions(n - j*d)
+          d += 1
+      P[n] = sum
+    else:
+      sum = P[n]
     return sum/n
 
   def choose_dj(n, rho):

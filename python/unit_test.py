@@ -46,10 +46,50 @@ class TestCombalgFunctions(unittest.TestCase):
       t = combalg.random_k_subset(a,k)
       self.assertTrue(len(t) == k)
       self.assertTrue(set(t) <= set(a))
+      
+  def test_compositions(self):
+    n = 15
+    k = 6
+    for t in combalg.compositions(n,k):
+      self.assertTrue(len(t) == k)
+      self.assertTrue(sum(t) == n)
   
-  # TODO: compositions
-  # TODO: permutations
-  # TODO: partitions
+  def test_random_compositions(self):
+    n = 15
+    k = 6
+    trials = 100
+    for i in xrange(trials):
+      t = combalg.random_composition(n,k)
+      self.assertTrue(len(t) == k)
+      self.assertTrue(sum(t) == n)
+      
+  def test_permutations(self):
+    n = 8
+    a = range(n)
+    for t in combalg.permutations(a):
+      self.assertTrue(len(t) == n)
+      self.assertTrue(sorted(t) == a)
+
+  def test_random_permutation(self):
+    n = 8
+    trials = 5 * math.factorial(n)
+    a = range(n)
+    for i in xrange(trials):
+      t = combalg.random_permutation(a)
+      self.assertTrue(len(t) == n)
+      self.assertTrue(sorted(t) == a)
+
+  def test_partitions(self):
+    n = 15
+    for t in combalg.partitions(n):
+      self.assertTrue(sum(t) == n)
+  
+  def test_random_partition(self):
+    n = 15
+    trials = 100
+    for i in xrange(trials):
+      t = combalg.random_partition(n)
+      self.assertTrue(sum(t) == n)
 
 # execute
 suite = unittest.TestLoader().loadTestsFromTestCase(TestCombalgFunctions)
