@@ -37,3 +37,6 @@ Icon
 
 # compiled python
 *.pyc
+
+# test files
+test.*

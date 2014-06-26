@@ -79,18 +79,28 @@ class TestCombalgFunctions(unittest.TestCase):
       self.assertTrue(len(t) == n)
       self.assertTrue(sorted(t) == a)
 
-  def test_partitions(self):
+  def test_integer_partitions(self):
     n = 15
-    for t in combalg.partitions(n):
+    for t in combalg.integer_partitions(n):
       self.assertTrue(sum(t) == n)
   
-  def test_random_partition(self):
+  def test_random_integer_partition(self):
     n = 15
     trials = 100
     for i in xrange(trials):
-      t = combalg.random_partition(n)
+      t = combalg.random_integer_partition(n)
       self.assertTrue(sum(t) == n)
+      
+  def test_set_partitions(self):
+    n = 5
+    for pop,cls,nc in combalg.set_partitions(n):
+      # at most n equivalence classes
+      self.assertTrue(nc <= n)
+      # sum of populations of equivalence classes = n
+      self.assertTrue(sum(pop) == n)
+      # equiv class of each element is in [0,1,...,nc-1]
+      self.assertTrue(all(map(lambda x: x<nc, cls)))
 
 # execute
 suite = unittest.TestLoader().loadTestsFromTestCase(TestCombalgFunctions)
-unittest.TextTestRunner(verbosity=3).run(suite)
+unittest.TextTestRunner(verbosity=2).run(suite)

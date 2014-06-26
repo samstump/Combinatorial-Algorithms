@@ -136,10 +136,10 @@ def random_permutation(elements):
   return a
   
 '''
-  A generator that returns all partitions of n, that is all x0,x1,x2,...,xk such that sum(xi)k = n and xi > 0
+  A generator that returns all integer partitions of n, that is all x0,x1,x2,...,xk such that sum(xi)k = n and xi > 0
   Algorithm ZS1 in [2]
 '''  
-def partitions(n):
+def integer_partitions(n):
   x = [1]*n
   x[0] = n
   m = 1
@@ -169,13 +169,13 @@ def partitions(n):
     yield x[:m]
 
 '''
-  Returns a random partition of n
+  Returns a random integer partition of n
   TODO: 
     the local function 'num_partitions(n)' is not smart at all
     the local functions 'num_partitions(n)' and 'choose_dj(n, rho)' can be combined, as in [1].  I have had better
       luck implementing algorithms from [1] using the mathematical description and NOT using the fortran source.
 '''
-def random_partition(n):
+def random_integer_partition(n):
   P = {}
   def num_partitions(n):
     if n <= 1:
@@ -213,3 +213,39 @@ def random_partition(n):
     a = a + [d]*j
     m -= j*d
   return sorted(a,reverse=True)
+
+'''
+  A generator that returns all set partitions of [n] = {0,1,2,...,n-1}.  The result is returned as a
+  3-tuple (p,q,nc):
+    p - a list where p[i] is the population of the i-th equivalence class
+    q - a list where q[i] is the equivalence class of i
+    nc - the number of equivalence classes in the partition
+'''
+def set_partitions(n):
+  p = [n] + [0]*(n-1)
+  nc = 1
+  q = [0]*n
+  m = n
+  yield p,q,nc
+  
+  while nc != n:
+    m = n
+    while True:
+      l = q[m-1]
+      if p[l] != 1:
+        break
+      q[m-1] = 0
+      m -= 1
+    z = m - n
+    if z < 0:
+      for i in xrange(0,z,-1):
+        p[nc+i-1] = 0
+    nc += z
+    p[0] -= z
+    if l == nc - 1:
+      p[nc] = 0
+      nc += 1
+    q[m-1] = l+1
+    p[l] -= 1
+    p[l+1] += 1
+    yield p,q,nc
