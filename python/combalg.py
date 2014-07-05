@@ -3,9 +3,9 @@
   This package is a collection of combinatorial algorithms primarily for enumeration and random selection
   of combinatorial objects like sets, subsets, permutationsm partitions and compositions.  The source(s) for
   these algorithms comes from
-    [1] "Combinatorial Algorithms (for Computers and Calculators), 2nd ed.", Nijenhuis & Wilf, Academic Press, 1978
+    [NW1978] "Combinatorial Algorithms (for Computers and Calculators), 2nd ed.", Nijenhuis & Wilf, Academic Press, 1978
         http://www.math.upenn.edu/~wilf/website/CombinatorialAlgorithms.pdf
-    [2] "Fast Algorithms for Generating Integer Partitions", Zoghbi & Stojmenovic, 1998
+    [ZS1998] "Fast Algorithms for Generating Integer Partitions", Zoghbi & Stojmenovic, 1998
         http://www.site.uottawa.ca/~ivan/F49-int-part.pdf
 '''
 
@@ -57,7 +57,7 @@ def random_subset(elements):
   return filter(lambda x: random.random() <= 0.5, elements)
   
 '''
-  Returns a random k-element subset of a set of elements.  This is a clever algorithm, explained in [1]
+  Returns a random k-element subset of a set of elements.  This is a clever algorithm, explained in [NW1978]
   but not actually implemented.  Essentially starting with the first element of the universal set, include
   it in the subset with p=k/n.  If the first was selected, select the next with p=(k-1)/(n-1), if not
   p = k/(n-1), etc.  The 'pythonic' implementation included in the comments is roughly half as performant
@@ -137,7 +137,7 @@ def random_permutation(elements):
   
 '''
   A generator that returns all integer partitions of n, that is all x0,x1,x2,...,xk such that sum(xi)k = n and xi > 0
-  Algorithm ZS1 in [2]
+  Algorithm ZS1 in [ZS1998]
 '''  
 def integer_partitions(n):
   x = [1]*n
@@ -172,8 +172,8 @@ def integer_partitions(n):
   Returns a random integer partition of n
   TODO: 
     the local function 'num_partitions(n)' is not smart at all
-    the local functions 'num_partitions(n)' and 'choose_dj(n, rho)' can be combined, as in [1].  I have had better
-      luck implementing algorithms from [1] using the mathematical description and NOT using the fortran source.
+    the local functions 'num_partitions(n)' and 'choose_dj(n, rho)' can be combined, as in [NW1978].  I have had better
+      luck implementing algorithms from [NW1978] using the mathematical description and NOT using the fortran source.
 '''
 def random_integer_partition(n):
   P = {}
@@ -220,7 +220,19 @@ def random_integer_partition(n):
     p - a list where p[i] is the population of the i-th equivalence class
     q - a list where q[i] is the equivalence class of i
     nc - the number of equivalence classes in the partition
+    
+  The following will map the list q into a list of sets that make up the partition.  
+  TODO: I'd like to see a more efficient/pythonic way:
+  
+  def map_set_partition(a, cls):
+  y = []
+  for t in xrange(len(a)):
+    x = reduce(lambda x,y: x+[a[y]] if cls[y] == t else x, range(len(a)), [])
+    if x:
+      y.append(x)
+  return y
 '''
+
 def set_partitions(n):
   p = [n] + [0]*(n-1)
   nc = 1
@@ -236,6 +248,9 @@ def set_partitions(n):
         break
       q[m-1] = 0
       m -= 1
+    # the variable z, and the if block below seem to be needed when the number of equivalence classes decreases
+    # and we need to set the populations of the 'previously used' classes back to zero.  It would be nice to find
+    # a way around this, since the algorithm in [NW1978] is loop free.
     z = m - n
     if z < 0:
       for i in xrange(0,z,-1):
