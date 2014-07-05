@@ -6,6 +6,15 @@ import unittest
 def nCr(n,r):
   return math.factorial(n)/math.factorial(r)/math.factorial(n-r)
 
+def map_set_partition(a, cls):
+  y = []
+  for t in xrange(len(a)):
+    x = reduce(lambda x,y: x+[a[y]] if cls[y] == t else x, range(len(a)), [])
+    if x:
+      y.append(x)
+  return y
+
+  
 # TODO: the generator tests should test for uniqueness
 
 class TestCombalgFunctions(unittest.TestCase):
@@ -71,7 +80,7 @@ class TestCombalgFunctions(unittest.TestCase):
       self.assertTrue(sorted(t) == a)
 
   def test_random_permutation(self):
-    n = 8
+    n = 6
     trials = 5 * math.factorial(n)
     a = range(n)
     for i in xrange(trials):
@@ -92,15 +101,19 @@ class TestCombalgFunctions(unittest.TestCase):
       self.assertTrue(sum(t) == n)
       
   def test_set_partitions(self):
-    n = 5
+    a = range(6)
+    n = len(a)
     for pop,cls,nc in combalg.set_partitions(n):
-      # at most n equivalence classes
-      self.assertTrue(nc <= n)
-      # sum of populations of equivalence classes = n
-      self.assertTrue(sum(pop) == n)
-      # equiv class of each element is in [0,1,...,nc-1]
-      self.assertTrue(all(map(lambda x: x<nc, cls)))
+      y = map_set_partition(a, cls)
+      # union of all partition elements -> a
+      self.assertTrue(set().union(*y) == set(a))
+      # intersection of all partitions -> {}
+      self.assertTrue(set().intersection(*y) == set())
 
+#
+#
+#
 # execute
 suite = unittest.TestLoader().loadTestsFromTestCase(TestCombalgFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
+
