@@ -10,6 +10,7 @@
 '''
 
 import random
+import collections
 
 '''
   A generator that produces all subsets of the input 'set' of elements.  The input doesn't need 
@@ -264,3 +265,71 @@ def set_partitions(n):
     p[l] -= 1
     p[l+1] += 1
     yield p,q,nc
+    
+'''
+  n-choose-k, probably an unexpected implementation.  It uses the definition nCk = (n)_k/k!,
+  where (n)_k is the 'falling factorial' of k terms: n*(n-1)*(n-2)...(n-(k-1)).  This keeps integers in
+  smaller terms than the old standby n!/(n-k)!/k!, fewer multiplies, should be more efficient.  The one
+  issue I have with this implementation is believing the division in the last statement.  But it is a fact:
+  k! divides the product of ANY k consecutive integers.  This is evident if we remember that we are computing
+  binomial coefficients, which are integral.  But that isn't very unsatisfying, and I can't find an elementary 
+  proof.  This is the best I can come up with:
+  
+  Among all products of k consecutive integers, k! has the least power of any prime p dividing them.  IOW, for 
+  every prime factor of k!, (n)_k has the same prime factor with the same or higher multiplicity.
+'''
+def nCk(n,k):
+  # take care of nonsense
+  if k > n or k < 0:
+    return 0
+  nk = 1    # (n)_k : falling factorial
+  kf = 1    # k!    : k-factorial
+  for i in xrange(0,k):
+    nk *= n-i
+    kf *= k-i
+  return nk/kf
+
+''' 
+The bell numbers, OEIS: A000110, https://oeis.org/A000110
+'''
+g_bell = {}
+def bell_number(n):
+  if n == 0:
+    return 1
+  if n not in g_bell:
+    g_bell[n] = sum([nCk(n-1,k) * bell_number(k) for k in range(n)])
+  return g_bell[n]
+
+'''
+  Returns a random partition of the input set
+'''
+def random_set_partition(a):
+  # probability that the set partition that contains n, contains n-k other members
+  def prob(n,k):
+    return float(nCk(n-1,k-1))*bell_number(n-k)/bell_number(n)
+
+  # labels a partition of [n] with the members of a (the input set)
+  def label_partition(a, q):
+    b = collections.defaultdict(frozenset)
+    for t in xrange(len(q)):
+      b[q[t]] = b[q[t]].union(frozenset(a[t]))
+    return frozenset(b.values())
+    
+  n = len(a)
+  q = [0]*n
+  m = n
+  l = 0
+  while m > 0:
+    sum = 0
+    rho = random.random()
+    k = 1
+    while k <= m:
+      sum += prob(m,k)
+      if sum >= rho:
+        break
+      k += 1
+    for i in xrange(m-k,m):
+      q[i] = l
+    l += 1
+    m -= k
+  return label_partition(a, random_permutation(q))

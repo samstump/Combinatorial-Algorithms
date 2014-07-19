@@ -3,9 +3,6 @@ import time
 import math
 import unittest
 
-def nCr(n,r):
-  return math.factorial(n)/math.factorial(r)/math.factorial(n-r)
-
 def map_set_partition(a, cls):
   y = []
   for t in xrange(len(a)):
@@ -44,7 +41,7 @@ class TestCombalgFunctions(unittest.TestCase):
       self.assertTrue(len(t) == k)
       self.assertTrue(set(t) <= set(a))
       i += 1
-    self.assertTrue(i == nCr(n,k))
+    self.assertTrue(i == combalg.nCk(n,k))
     
   def test_random_k_subset(self):
     n = 15
@@ -105,11 +102,21 @@ class TestCombalgFunctions(unittest.TestCase):
     n = len(a)
     for pop,cls,nc in combalg.set_partitions(n):
       y = map_set_partition(a, cls)
-      # union of all partition elements -> a
+      # union of all partition elements == a
       self.assertTrue(set().union(*y) == set(a))
-      # intersection of all partitions -> {}
+      # intersection of all partitions == {}
       self.assertTrue(set().intersection(*y) == set())
 
+  def test_random_set_partitions(self):
+    a = ['a','b','c','d','e','f']
+    trials = 100
+    for i in xrange(trials):
+      # let p = the given set partition
+      p = combalg.random_set_partition(a)
+      # union of members of p == a
+      self.assertTrue(set().union(*p) == set(a))
+      # intersection of members of p == {}
+      self.assertTrue(set().intersection(*p) == set())
 #
 #
 #
