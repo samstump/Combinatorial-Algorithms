@@ -2,6 +2,7 @@ import combalg
 import time
 import math
 import unittest
+import utility
 
 def map_set_partition(a, cls):
   y = []
@@ -117,10 +118,20 @@ class TestCombalgFunctions(unittest.TestCase):
       self.assertTrue(set().union(*p) == set(a))
       # intersection of members of p == {}
       self.assertTrue(set().intersection(*p) == set())
+      
+  def test_random_rooted_tree(self):
+    n = 10
+    trials = 1000
+    for i in xrange(trials):
+      t = combalg.random_rooted_tree(n)
+      edge_list = []
+      for j in xrange(1,len(t)):
+        edge_list.append((j,t[j]))
+      self.assertTrue(len(edge_list) == n-1)
+      self.assertTrue(utility.is_tree(n,edge_list))
 #
 #
 #
 # execute
 suite = unittest.TestLoader().loadTestsFromTestCase(TestCombalgFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
-

@@ -176,21 +176,20 @@ def integer_partitions(n):
     the local functions 'num_partitions(n)' and 'choose_dj(n, rho)' can be combined, as in [NW1978].  I have had better
       luck implementing algorithms from [NW1978] using the mathematical description and NOT using the fortran source.
 '''
+integer_partition_count = {}
 def random_integer_partition(n):
-  P = {}
   def num_partitions(n):
     if n <= 1:
       return 1
-    if n not in P:
+    if n not in integer_partition_count:
       sum = 1
       for j in xrange(1,n):
         d = 1
         while n - j*d >= 0:
           sum += d * num_partitions(n - j*d)
           d += 1
-      P[n] = sum
-    else:
-      sum = P[n]
+      integer_partition_count[n] = sum
+    sum = integer_partition_count[n]
     return sum/n
 
   def choose_dj(n, rho):
@@ -333,3 +332,83 @@ def random_set_partition(a):
     l += 1
     m -= k
   return label_partition(a, random_permutation(q))
+
+'''
+  Returns a random rooted tree on nn vertices
+'''
+rooted_tree_count = {}
+def random_rooted_tree(nn):
+  def tc(n):
+    if n not in rooted_tree_count:
+      if n <= 2:
+        rooted_tree_count[n] = 1
+      else:
+        sum = 0
+        for m in xrange(1,n):
+          inner = 0
+          term = tc(n-m)
+          for d in xrange(1,m+1):
+            if m % d == 0:
+              inner += d * tc(d)
+          sum += term * inner
+        rooted_tree_count[n] = sum / (n-1)
+    return rooted_tree_count[n]
+    
+  def select_jd(n):
+    tn = tc(n)
+    rho = random.random()
+    sum = 0
+    for j in xrange(1,n+1):
+      for d in xrange(1,n+1):
+        if n - j*d > 0:
+          prob = float(d)*tc(n-j*d)*tc(d)/((n-1)*tn)
+          sum += prob    
+          if sum > rho:
+            return j,d
+
+  # begin random rooted tree
+  stack = []
+  tree = []
+  t = 0
+  tm1 = -1
+  k = 0
+  r = 0
+  n = nn
+  
+  done = False
+  while not done:
+    if n <= 2:
+      tm1 = t
+      t = len(tree)
+      for i in xrange(0,n):
+        tree.append(t)
+      k += n
+    else:
+      j,d = select_jd(n)
+      stack.append((j,d))
+      n = n - j*d
+      continue
+    while len(stack) > 0:
+      j,d = stack.pop()
+      if d > 0:
+        stack.append((j,0))
+        n = d
+        break
+      else:
+        lt = len(tree)
+        for i in xrange(0,j-1):
+          save = tree[t]
+          for j in xrange(t,lt):
+            if tree[j] != save:
+              k += 1
+            tree.append(k)
+        for j in xrange(t,len(tree)):
+          if tree[j] == j:
+            tree[j] = tm1
+        t = tm1
+        if tm1 > 0:
+          tm1 -= 1
+        while tm1 > 0 and tree[tm1] != tm1:
+          tm1 -= 1
+        done = len(stack) == 0
+  return tree
