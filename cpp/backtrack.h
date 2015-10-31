@@ -19,7 +19,7 @@ class Strategy {
 		virtual ~Strategy() {}
 };
 
-// TODO: Evaluate the function call operator (operator()).  Is this better than a named function?
+// TODO: Remove the function call operator in favor of a named function.  Readability wins.
 
 template <typename ElemType>
 class Accumulator {
@@ -32,7 +32,7 @@ class Accumulator {
 
 // TODO: The 'verbose' flag in backtrack class needs some thought.  Don't depend on std::cout for example.
 // TODO: Unify the logging (verbose) for all classes concerned (backtrack, Strategy and Accumulator).
-// TODO: Evaluate the function call operator (operator()).  Is this better than a named function?
+// TODO: Remove the function call operator in favor of a named function.  Readability wins.
 template <typename ElemType>
 class backtrack {
 	public:
