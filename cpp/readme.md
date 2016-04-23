@@ -1,1 +1,2 @@
-C++ implementation of parent project!
+Combinatorial Algorithms in C++
+
