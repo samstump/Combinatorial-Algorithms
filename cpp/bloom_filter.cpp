@@ -1,5 +1,8 @@
 // bloom_filter.cpp
 
+// build: g++ -std=c++11 bloom_filter.cpp -L/usr/lib -lcrypto -o bf
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
